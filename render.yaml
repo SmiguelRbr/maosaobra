@@ -1,18 +1,14 @@
 # Arquivo: render.yaml
-# Define os serviços para o Render.com
-# Nota: A indentação (espaços no início da linha) é MUITO importante em YAML.
+# Define os serviços para o Render.com (Versão Corrigida)
 
 services:
   # ----- 1. O Banco de Dados PostgreSQL (Grátis) -----
-  - type: pserv # 'pserv' significa PostgreSQL Service
+  - type: pserv
     name: laravel-db # Um nome interno para o banco
     plan: free # Define o plano gratuito
-    databaseName: laravel_db_app # O nome da base de dados que será criada
-    user: laravel_user # O nome do utilizador
-    region: frankfurt # Região do servidor (pode ser 'ohio', 'oregon')
-    
-    # Versão do Postgres. O Laravel 12 funciona bem com a 14+
-    postgresMajorVersion: 14
+    region: frankfurt # Região do servidor
+    # NOTA: Removemos 'databaseName', 'user' e 'postgresMajorVersion'
+    # O Render irá criá-los automaticamente no plano gratuito.
 
   # ----- 2. A Aplicação Laravel (Web Service Grátis) -----
   - type: web
@@ -26,7 +22,7 @@ services:
     # Comandos que o Render executa ao fazer "build" (instalar)
     buildCommand: |
       composer install --no-dev --no-interaction --optimize-autoloader
-      php artisan key:generate --force # Garante que a APP_KEY existe no ambiente
+      php artisan key:generate --force
       php artisan config:cache
       php artisan route:cache
       php artisan view:cache
@@ -49,7 +45,6 @@ services:
       - key: APP_DEBUG
         value: false
           
-      # Referencia a APP_KEY. Vamos definir o valor disto na interface do Render.
-      # (O 'key:generate' no buildCommand é uma segurança extra)
+      # Referencia a APP_KEY (que vamos definir na interface do Render)
       - key: APP_KEY
-        sync: false # 'sync: false' significa que o valor não fica guardado neste arquivo.
+        sync: false
