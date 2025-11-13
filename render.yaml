@@ -1,0 +1,55 @@
+# Arquivo: render.yaml
+# Define os serviços para o Render.com
+# Nota: A indentação (espaços no início da linha) é MUITO importante em YAML.
+
+services:
+  # ----- 1. O Banco de Dados PostgreSQL (Grátis) -----
+  - type: pserv # 'pserv' significa PostgreSQL Service
+    name: laravel-db # Um nome interno para o banco
+    plan: free # Define o plano gratuito
+    databaseName: laravel_db_app # O nome da base de dados que será criada
+    user: laravel_user # O nome do utilizador
+    region: frankfurt # Região do servidor (pode ser 'ohio', 'oregon')
+    
+    # Versão do Postgres. O Laravel 12 funciona bem com a 14+
+    postgresMajorVersion: 14
+
+  # ----- 2. A Aplicação Laravel (Web Service Grátis) -----
+  - type: web
+    name: laravel-app # Um nome interno para o seu site
+    plan: free # Define o plano gratuito
+    region: frankfurt # IMPORTANTE: Use a MESMA região do banco de dados
+    
+    # Define o ambiente nativo de PHP
+    env: php 
+
+    # Comandos que o Render executa ao fazer "build" (instalar)
+    buildCommand: |
+      composer install --no-dev --no-interaction --optimize-autoloader
+      php artisan key:generate --force # Garante que a APP_KEY existe no ambiente
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+      php artisan migrate --force # Executa as migrações automaticamente
+
+    # Comando que o Render usa para INICIAR o servidor
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+
+    # Variáveis de Ambiente que vêm do Render
+    envVars:
+      # O Render injeta automaticamente a URL do banco de dados
+      - key: DATABASE_URL
+        fromDatabase:
+          name: laravel-db # DEVE ser o mesmo nome do serviço de DB (item 1)
+          property: connectionString
+      
+      # Informa ao Laravel que estamos em produção
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+          
+      # Referencia a APP_KEY. Vamos definir o valor disto na interface do Render.
+      # (O 'key:generate' no buildCommand é uma segurança extra)
+      - key: APP_KEY
+        sync: false # 'sync: false' significa que o valor não fica guardado neste arquivo.
