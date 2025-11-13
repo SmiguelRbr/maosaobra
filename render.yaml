@@ -1,38 +1,45 @@
-# render.yaml
-# Define os serviços para o Render.com
-
-databases:
-  # ----- 1. Banco de Dados PostgreSQL (Grátis) -----
-  - name: laravel-db
-    plan: free
-    region: frankfurt
+# Arquivo: render.yaml
+# Define os serviços para o Render.com (Versão 5 - Final)
 
 services:
-  # ----- 2. Aplicação Laravel (Web Service Grátis) -----
+  # ----- 1. O Banco de Dados PostgreSQL (Grátis) -----
+  - type: pserv # <-- O TIPO CORRETO. 'pserv' é o serviço de DB grátis.
+    name: laravel-db
+    plan: free
+    region: frankfurt
+    # Não adicionamos mais nenhuns campos (databaseName, user, etc.)
+
+  # ----- 2. A Aplicação Laravel (Web Service Grátis) -----
   - type: web
     name: laravel-app
     plan: free
-    region: frankfurt
-    runtime: php
+    region: frankfurt # IMPORTANTE: Use a MESMA região do banco
     
+    runtime: php # <-- O RUNTIME CORRETO para PHP.
+
+    # Comandos que o Render executa ao fazer "build" (instalar)
     buildCommand: |
       composer install --no-dev --no-interaction --optimize-autoloader
       php artisan key:generate --force
       php artisan config:cache
       php artisan route:cache
       php artisan view:cache
-      php artisan migrate --force
+      php artisan migrate --force # Executa as migrações
 
+    # Comando que o Render usa para INICIAR o servidor
     startCommand: php artisan serve --host 0.0.0.0 --port $PORT
 
+    # Variáveis de Ambiente
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: laravel-db
+          name: laravel-db # Deve ser o mesmo nome do serviço 'pserv' acima
           property: connectionString
+      
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
+          
       - key: APP_KEY
-        sync: false
+        sync: false # Definida na interface do Render
