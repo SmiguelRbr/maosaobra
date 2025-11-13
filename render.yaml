@@ -1,0 +1,16 @@
+# Define que este é um serviço web
+services:
+  - type: web
+    # IMPORTANTE: Coloque aqui o nome exato do seu serviço
+    name: maosaobra-1
+
+    # Diz ao Render para usar Docker
+    runtime: docker
+    dockerfilePath: ./Dockerfile # O caminho para o seu Dockerfile
+
+    # AQUI ESTÁ A SOLUÇÃO:
+    # Define o comando de migração
+    preDeployCommand: "php artisan migrate --force"
+
+    # O comando de início (apache2-foreground) já está no seu Dockerfile,
+    # por isso não precisamos de o repetir aqui.
