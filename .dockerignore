@@ -1,0 +1,9 @@
+# Arquivos de ambiente e repositório
+.env
+.git
+.gitignore
+
+# Pastas de dependências e cache
+vendor/
+node_modules/
+storage/

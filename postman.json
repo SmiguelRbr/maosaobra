@@ -1,0 +1,662 @@
+{
+  "info": {
+    "name": "Laravel API - Sistema de Orçamentos",
+    "description": "Collection completa da API Laravel para sistema de orçamentos com prestadores de serviço",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticação",
+      "item": [
+        {
+          "name": "Registrar Usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@email.com\",\n  \"phone\": \"11999999999\",\n  \"password\": \"12345678\",\n  \"password_confirmation\": \"12345678\",\n  \"birthDate\": \"1990-01-01\",\n  \"cpf\": \"12345678901\",\n  \"cnpj\": null,\n  \"role\": \"cliente\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('token', response.token);",
+                  "    pm.collectionVariables.set('token', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@email.com\",\n  \"password\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["refresh"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Usuários",
+      "item": [
+        {
+          "name": "Atualizar Role do Usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"prestador\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/role",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1", "role"]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Prestador (Experiência + Imagem)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "experiencia",
+                  "value": "Tenho 5 anos de experiência em serviços elétricos residenciais...",
+                  "type": "text"
+                },
+                {
+                  "key": "imagePath",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/prestador",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1", "prestador"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Especialidades",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"especialidade\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/especialidades",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1", "especialidades"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Especialidades do Usuário",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users/1/especialidades",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1", "especialidades"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📍 Endereços",
+      "item": [
+        {
+          "name": "Cadastrar Endereço",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipCode\": \"01234567\",\n  \"state\": \"SP\",\n  \"city\": \"São Paulo\",\n  \"district\": \"Centro\",\n  \"street\": \"Rua das Flores\",\n  \"number\": \"123\",\n  \"complement\": \"Apto 45\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/addresses",
+              "host": ["{{base_url}}"],
+              "path": ["addresses"]
+            }
+          }
+        },
+        {
+          "name": "Listar Endereços do Usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/addresses",
+              "host": ["{{base_url}}"],
+              "path": ["addresses"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Orçamentos",
+      "item": [
+        {
+          "name": "Criar Orçamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cliente_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "prestador_id",
+                  "value": "2",
+                  "type": "text"
+                },
+                {
+                  "key": "address_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "Reparo na instalação elétrica da cozinha",
+                  "type": "text"
+                },
+                {
+                  "key": "visita",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "data",
+                  "value": "2024-12-20",
+                  "type": "text"
+                },
+                {
+                  "key": "observacoes",
+                  "value": "Preferência para manhã",
+                  "type": "text"
+                },
+                {
+                  "key": "imagens",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/orcamentos",
+              "host": ["{{base_url}}"],
+              "path": ["orcamentos"]
+            }
+          }
+        },
+        {
+          "name": "Listar Orçamentos do Cliente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orcamentos/cliente/1",
+              "host": ["{{base_url}}"],
+              "path": ["orcamentos", "cliente", "1"]
+            }
+          }
+        },
+        {
+          "name": "Listar Orçamentos do Prestador",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orcamentos/prestador/1",
+              "host": ["{{base_url}}"],
+              "path": ["orcamentos", "prestador", "1"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Visita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": \"2024-12-21\",\n  \"visita\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orcamentos/1/visita",
+              "host": ["{{base_url}}"],
+              "path": ["orcamentos", "1", "visita"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orcamentos/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["orcamentos", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Finalizar Serviço",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "avaliacao",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "feedback",
+                  "value": "Excelente serviço, muito profissional!",
+                  "type": "text"
+                },
+                {
+                  "key": "status_id",
+                  "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "imagens",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/orcamentos/1/finalizar",
+              "host": ["{{base_url}}"],
+              "path": ["orcamentos", "1", "finalizar"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notificações",
+      "item": [
+        {
+          "name": "Criar Notificação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orcamento_id\": 1,\n  \"remetente_id\": 1,\n  \"destinatario_id\": 2,\n  \"descricao\": \"Novo orçamento solicitado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/notificacoes",
+              "host": ["{{base_url}}"],
+              "path": ["notificacoes"]
+            }
+          }
+        },
+        {
+          "name": "Listar Notificações por Destinatário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificacoes/destinatario/1",
+              "host": ["{{base_url}}"],
+              "path": ["notificacoes", "destinatario", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Posts",
+      "item": [
+        {
+          "name": "Criar Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "descricao",
+                  "value": "Acabei de finalizar um projeto de instalação elétrica!",
+                  "type": "text"
+                },
+                {
+                  "key": "imagens",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/posts",
+              "host": ["{{base_url}}"],
+              "path": ["posts"]
+            }
+          }
+        },
+        {
+          "name": "Listar Todos os Posts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/posts",
+              "host": ["{{base_url}}"],
+              "path": ["posts"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Dados Públicos",
+      "item": [
+        {
+          "name": "Listar Tipos de Usuário",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/userTypes",
+              "host": ["{{base_url}}"],
+              "path": ["userTypes"]
+            }
+          }
+        },
+        {
+          "name": "Listar Especialidades",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/specialties",
+              "host": ["{{base_url}}"],
+              "path": ["specialties"]
+            }
+          }
+        },
+        {
+          "name": "Listar Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/statuses",
+              "host": ["{{base_url}}"],
+              "path": ["statuses"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📧 Verificação de Email",
+      "item": [
+        {
+          "name": "Reenviar Email de Verificação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/verification-notification",
+              "host": ["{{base_url}}"],
+              "path": ["email", "verification-notification"]
+            }
+          }
+        },
+        {
+          "name": "Verificar Email",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/email/verify/{id}/{hash}",
+              "host": ["{{base_url}}"],
+              "path": ["email", "verify", "{id}", "{hash}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
