@@ -1,13 +1,12 @@
 # Arquivo: render.yaml
-# Define os serviços para o Render.com (Versão 5 - Final)
+# Define os serviços para o Render.com (Versão 6 - Corrigida)
 
 services:
   # ----- 1. O Banco de Dados PostgreSQL (Grátis) -----
-  - type: pserv # <-- O TIPO CORRETO. 'pserv' é o serviço de DB grátis.
+  - type: pserv # Esta parte estava correta
     name: laravel-db
     plan: free
     region: frankfurt
-    # Não adicionamos mais nenhuns campos (databaseName, user, etc.)
 
   # ----- 2. A Aplicação Laravel (Web Service Grátis) -----
   - type: web
@@ -15,7 +14,7 @@ services:
     plan: free
     region: frankfurt # IMPORTANTE: Use a MESMA região do banco
     
-    runtime: php # <-- O RUNTIME CORRETO para PHP.
+    env: php # <-- CORREÇÃO: 'env' é a chave correta, 'runtime' estava errado.
 
     # Comandos que o Render executa ao fazer "build" (instalar)
     buildCommand: |
